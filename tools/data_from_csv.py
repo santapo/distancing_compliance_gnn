@@ -6,9 +6,8 @@ from torch_geometric.data import Data
 
 
 def append_node_indices(dataframe):
-    num_nodes = dataframe.shape[0]
-    node_indices = [i for i in range(num_nodes)]
-    dataframe['node_index'] = node_indices
+    dataframe['node_index'] = dataframe.groupby('fname').cumcount()
+    # import ipdb; ipdb.set_trace()
     return dataframe
 
 def append_graph_indices(dataframe):
@@ -72,7 +71,10 @@ def save_data_to_pt(dataframe):
     fname_labels = {item[0]: int(item[1]) for item in fname_labels}
     y = [fname_labels[fname] for fname, _ in fname_set]
     y = torch.tensor(y)
-    y_slices = torch.tensor([i for _, i in fname_set])
+    y_slices = [i for _, i in fname_set]
+    y_slices.append(2872)
+    y_slices = torch.tensor(y_slices)
+
 
     data = Data(x=x, edge_index=edge_index, y=y)
     dataset = (data, {'edge_index': edge_index_slices, 'x': x_slices, 'y': y_slices})
